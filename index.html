@@ -1,0 +1,178 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 900px;
+                 background-color: white;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "font": {"color": "black"}, "id": "load", "label": "load", "shape": "dot", "title": "load Neighbors:\u003cbr\u003ebalancer\u003cbr\u003ebalancing", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "balancer", "label": "balancer", "shape": "dot", "title": "balancer Neighbors:\u003cbr\u003eload", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "ingres", "label": "ingres", "shape": "dot", "title": "ingres Neighbors:\u003cbr\u003enginx\u003cbr\u003eresource\u003cbr\u003econtroller", "value": 3}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "controller", "label": "controller", "shape": "dot", "title": "controller Neighbors:\u003cbr\u003eingres", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "helm", "label": "helm", "shape": "dot", "title": "helm Neighbors:\u003cbr\u003echart", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "chart", "label": "chart", "shape": "dot", "title": "chart Neighbors:\u003cbr\u003ehelm", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "kubernetes", "label": "kubernetes", "shape": "dot", "title": "kubernetes Neighbors:\u003cbr\u003ecluster\u003cbr\u003eapi\u003cbr\u003erunning\u003cbr\u003erun\u003cbr\u003eservice", "value": 5}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "cluster", "label": "cluster", "shape": "dot", "title": "cluster Neighbors:\u003cbr\u003erunning\u003cbr\u003enode\u003cbr\u003ekubernetes\u003cbr\u003eoutside", "value": 4}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "docker", "label": "docker", "shape": "dot", "title": "docker Neighbors:\u003cbr\u003eimage\u003cbr\u003econtainer", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "image", "label": "image", "shape": "dot", "title": "image Neighbors:\u003cbr\u003etag\u003cbr\u003edocker\u003cbr\u003econtainer", "value": 3}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "open", "label": "open", "shape": "dot", "title": "open Neighbors:\u003cbr\u003esource", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "source", "label": "source", "shape": "dot", "title": "source Neighbors:\u003cbr\u003eopen", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "bare", "label": "bare", "shape": "dot", "title": "bare Neighbors:\u003cbr\u003emetal", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "metal", "label": "metal", "shape": "dot", "title": "metal Neighbors:\u003cbr\u003ebare", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "control", "label": "control", "shape": "dot", "title": "control Neighbors:\u003cbr\u003eplane", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "plane", "label": "plane", "shape": "dot", "title": "plane Neighbors:\u003cbr\u003econtrol", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "ip", "label": "ip", "shape": "dot", "title": "ip Neighbors:\u003cbr\u003eaddress", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "address", "label": "address", "shape": "dot", "title": "address Neighbors:\u003cbr\u003eip", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "cloud", "label": "cloud", "shape": "dot", "title": "cloud Neighbors:\u003cbr\u003eprovider\u003cbr\u003egoogle", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "provider", "label": "provider", "shape": "dot", "title": "provider Neighbors:\u003cbr\u003ecloud", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "worker", "label": "worker", "shape": "dot", "title": "worker Neighbors:\u003cbr\u003enode", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "node", "label": "node", "shape": "dot", "title": "node Neighbors:\u003cbr\u003epod\u003cbr\u003ecluster\u003cbr\u003esingle\u003cbr\u003eworker\u003cbr\u003emaster", "value": 5}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "for", "label": "for", "shape": "dot", "title": "for Neighbors:\u003cbr\u003eexample", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "example", "label": "example", "shape": "dot", "title": "example Neighbors:\u003cbr\u003efor", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "rolling", "label": "rolling", "shape": "dot", "title": "rolling Neighbors:\u003cbr\u003eupdate", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "update", "label": "update", "shape": "dot", "title": "update Neighbors:\u003cbr\u003erolling", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "api", "label": "api", "shape": "dot", "title": "api Neighbors:\u003cbr\u003egateway\u003cbr\u003ekubernetes\u003cbr\u003eserver", "value": 3}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "server", "label": "server", "shape": "dot", "title": "server Neighbors:\u003cbr\u003eapi\u003cbr\u003eweb", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "yaml", "label": "yaml", "shape": "dot", "title": "yaml Neighbors:\u003cbr\u003efile", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "file", "label": "file", "shape": "dot", "title": "file Neighbors:\u003cbr\u003econfig\u003cbr\u003eyaml", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "persistent", "label": "persistent", "shape": "dot", "title": "persistent Neighbors:\u003cbr\u003evolume", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "volume", "label": "volume", "shape": "dot", "title": "volume Neighbors:\u003cbr\u003epersistent", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "balancing", "label": "balancing", "shape": "dot", "title": "balancing Neighbors:\u003cbr\u003eload", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "environment", "label": "environment", "shape": "dot", "title": "environment Neighbors:\u003cbr\u003evariable", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "variable", "label": "variable", "shape": "dot", "title": "variable Neighbors:\u003cbr\u003eenvironment", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "master", "label": "master", "shape": "dot", "title": "master Neighbors:\u003cbr\u003enode", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "single", "label": "single", "shape": "dot", "title": "single Neighbors:\u003cbr\u003enode", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "service", "label": "service", "shape": "dot", "title": "service Neighbors:\u003cbr\u003eaccount\u003cbr\u003ediscovery\u003cbr\u003ename\u003cbr\u003etype\u003cbr\u003emesh\u003cbr\u003ekubernetes", "value": 6}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "mesh", "label": "mesh", "shape": "dot", "title": "mesh Neighbors:\u003cbr\u003eservice", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "network", "label": "network", "shape": "dot", "title": "network Neighbors:\u003cbr\u003epolicy", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "policy", "label": "policy", "shape": "dot", "title": "policy Neighbors:\u003cbr\u003enetwork", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "apiversion", "label": "apiversion", "shape": "dot", "title": "apiversion Neighbors:\u003cbr\u003ekind", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "kind", "label": "kind", "shape": "dot", "title": "kind Neighbors:\u003cbr\u003eapiversion", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "container", "label": "container", "shape": "dot", "title": "container Neighbors:\u003cbr\u003epod\u003cbr\u003eimage\u003cbr\u003edocker\u003cbr\u003einit", "value": 4}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "blog", "label": "blog", "shape": "dot", "title": "blog Neighbors:\u003cbr\u003epost", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "post", "label": "post", "shape": "dot", "title": "post Neighbors:\u003cbr\u003eblog", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "nginx", "label": "nginx", "shape": "dot", "title": "nginx Neighbors:\u003cbr\u003eingres", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "running", "label": "running", "shape": "dot", "title": "running Neighbors:\u003cbr\u003epod\u003cbr\u003erunning\u003cbr\u003ecluster\u003cbr\u003ekubernetes", "value": 4}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "config", "label": "config", "shape": "dot", "title": "config Neighbors:\u003cbr\u003efile", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "metadata", "label": "metadata", "shape": "dot", "title": "metadata Neighbors:\u003cbr\u003ename", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "name", "label": "name", "shape": "dot", "title": "name Neighbors:\u003cbr\u003emetadata\u003cbr\u003eservice", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "google", "label": "google", "shape": "dot", "title": "google Neighbors:\u003cbr\u003ecloud", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "pod", "label": "pod", "shape": "dot", "title": "pod Neighbors:\u003cbr\u003erunning\u003cbr\u003enode\u003cbr\u003econtainer", "value": 3}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "year", "label": "year", "shape": "dot", "title": "year Neighbors:\u003cbr\u003eago\u003cbr\u003elast", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "ago", "label": "ago", "shape": "dot", "title": "ago Neighbors:\u003cbr\u003eyear", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "account", "label": "account", "shape": "dot", "title": "account Neighbors:\u003cbr\u003eservice", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "health", "label": "health", "shape": "dot", "title": "health Neighbors:\u003cbr\u003echeck", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "check", "label": "check", "shape": "dot", "title": "check Neighbors:\u003cbr\u003ehealth", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "resource", "label": "resource", "shape": "dot", "title": "resource Neighbors:\u003cbr\u003eingres", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "cpu", "label": "cpu", "shape": "dot", "title": "cpu Neighbors:\u003cbr\u003ememory", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "memory", "label": "memory", "shape": "dot", "title": "memory Neighbors:\u003cbr\u003ecpu", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "kubectl", "label": "kubectl", "shape": "dot", "title": "kubectl Neighbors:\u003cbr\u003eapply", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "apply", "label": "apply", "shape": "dot", "title": "apply Neighbors:\u003cbr\u003ekubectl", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "init", "label": "init", "shape": "dot", "title": "init Neighbors:\u003cbr\u003econtainer", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "outside", "label": "outside", "shape": "dot", "title": "outside Neighbors:\u003cbr\u003ecluster", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "type", "label": "type", "shape": "dot", "title": "type Neighbors:\u003cbr\u003eloadbalancer\u003cbr\u003eservice", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "run", "label": "run", "shape": "dot", "title": "run Neighbors:\u003cbr\u003ekubernetes", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "work", "label": "work", "shape": "dot", "title": "work Neighbors:\u003cbr\u003efine\u003cbr\u003egreat", "value": 2}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "fine", "label": "fine", "shape": "dot", "title": "fine Neighbors:\u003cbr\u003ework", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "reverse", "label": "reverse", "shape": "dot", "title": "reverse Neighbors:\u003cbr\u003eproxy", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "proxy", "label": "proxy", "shape": "dot", "title": "proxy Neighbors:\u003cbr\u003ereverse", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "route", "label": "route", "shape": "dot", "title": "route Neighbors:\u003cbr\u003etraffic", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "traffic", "label": "traffic", "shape": "dot", "title": "traffic Neighbors:\u003cbr\u003eroute", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "hope", "label": "hope", "shape": "dot", "title": "hope Neighbors:\u003cbr\u003ehelp", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "help", "label": "help", "shape": "dot", "title": "help Neighbors:\u003cbr\u003ehope", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "gateway", "label": "gateway", "shape": "dot", "title": "gateway Neighbors:\u003cbr\u003eapi", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "stateful", "label": "stateful", "shape": "dot", "title": "stateful Neighbors:\u003cbr\u003eset", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "set", "label": "set", "shape": "dot", "title": "set Neighbors:\u003cbr\u003estateful", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "discovery", "label": "discovery", "shape": "dot", "title": "discovery Neighbors:\u003cbr\u003eservice", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "loadbalancer", "label": "loadbalancer", "shape": "dot", "title": "loadbalancer Neighbors:\u003cbr\u003etype", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "best", "label": "best", "shape": "dot", "title": "best Neighbors:\u003cbr\u003epractice", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "practice", "label": "practice", "shape": "dot", "title": "practice Neighbors:\u003cbr\u003ebest", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "web", "label": "web", "shape": "dot", "title": "web Neighbors:\u003cbr\u003eserver", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "could", "label": "could", "shape": "dot", "title": "could Neighbors:\u003cbr\u003efind", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "find", "label": "find", "shape": "dot", "title": "find Neighbors:\u003cbr\u003ecould", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "raspberry", "label": "raspberry", "shape": "dot", "title": "raspberry Neighbors:\u003cbr\u003epi", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "pi", "label": "pi", "shape": "dot", "title": "pi Neighbors:\u003cbr\u003eraspberry", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "great", "label": "great", "shape": "dot", "title": "great Neighbors:\u003cbr\u003ework", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "tag", "label": "tag", "shape": "dot", "title": "tag Neighbors:\u003cbr\u003eimage", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "last", "label": "last", "shape": "dot", "title": "last Neighbors:\u003cbr\u003eyear", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "looking", "label": "looking", "shape": "dot", "title": "looking Neighbors:\u003cbr\u003eforward", "value": 1}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "forward", "label": "forward", "shape": "dot", "title": "forward Neighbors:\u003cbr\u003elooking", "value": 1}]);
+                  edges = new vis.DataSet([{"from": "load", "to": "balancer", "value": 154}, {"from": "ingres", "to": "controller", "value": 152}, {"from": "helm", "to": "chart", "value": 127}, {"from": "kubernetes", "to": "cluster", "value": 104}, {"from": "docker", "to": "image", "value": 74}, {"from": "open", "to": "source", "value": 74}, {"from": "bare", "to": "metal", "value": 72}, {"from": "control", "to": "plane", "value": 71}, {"from": "ip", "to": "address", "value": 66}, {"from": "cloud", "to": "provider", "value": 65}, {"from": "worker", "to": "node", "value": 57}, {"from": "for", "to": "example", "value": 54}, {"from": "rolling", "to": "update", "value": 54}, {"from": "api", "to": "server", "value": 51}, {"from": "yaml", "to": "file", "value": 48}, {"from": "persistent", "to": "volume", "value": 47}, {"from": "load", "to": "balancing", "value": 47}, {"from": "node", "to": "cluster", "value": 43}, {"from": "environment", "to": "variable", "value": 43}, {"from": "master", "to": "node", "value": 41}, {"from": "single", "to": "node", "value": 41}, {"from": "service", "to": "mesh", "value": 39}, {"from": "network", "to": "policy", "value": 39}, {"from": "apiversion", "to": "kind", "value": 39}, {"from": "docker", "to": "container", "value": 38}, {"from": "blog", "to": "post", "value": 37}, {"from": "nginx", "to": "ingres", "value": 36}, {"from": "running", "to": "running", "value": 36}, {"from": "config", "to": "file", "value": 36}, {"from": "metadata", "to": "name", "value": 34}, {"from": "google", "to": "cloud", "value": 33}, {"from": "pod", "to": "node", "value": 32}, {"from": "year", "to": "ago", "value": 31}, {"from": "service", "to": "account", "value": 31}, {"from": "health", "to": "check", "value": 30}, {"from": "kubernetes", "to": "service", "value": 30}, {"from": "ingres", "to": "resource", "value": 30}, {"from": "cpu", "to": "memory", "value": 30}, {"from": "kubectl", "to": "apply", "value": 29}, {"from": "init", "to": "container", "value": 29}, {"from": "outside", "to": "cluster", "value": 28}, {"from": "container", "to": "pod", "value": 27}, {"from": "service", "to": "type", "value": 27}, {"from": "run", "to": "kubernetes", "value": 26}, {"from": "work", "to": "fine", "value": 26}, {"from": "reverse", "to": "proxy", "value": 26}, {"from": "route", "to": "traffic", "value": 25}, {"from": "hope", "to": "help", "value": 25}, {"from": "api", "to": "gateway", "value": 25}, {"from": "stateful", "to": "set", "value": 25}, {"from": "service", "to": "discovery", "value": 25}, {"from": "kubernetes", "to": "api", "value": 24}, {"from": "type", "to": "loadbalancer", "value": 24}, {"from": "container", "to": "image", "value": 24}, {"from": "running", "to": "cluster", "value": 23}, {"from": "best", "to": "practice", "value": 22}, {"from": "web", "to": "server", "value": 22}, {"from": "running", "to": "pod", "value": 22}, {"from": "could", "to": "find", "value": 22}, {"from": "raspberry", "to": "pi", "value": 22}, {"from": "service", "to": "name", "value": 22}, {"from": "running", "to": "kubernetes", "value": 21}, {"from": "work", "to": "great", "value": 21}, {"from": "image", "to": "tag", "value": 21}, {"from": "last", "to": "year", "value": 21}, {"from": "looking", "to": "forward", "value": 21}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": [
+            "physics"
+        ]
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -80000,
+            "springConstant": 0.001,
+            "springLength": 250
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
